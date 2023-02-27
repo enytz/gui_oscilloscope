@@ -21,8 +21,10 @@ struct TTY
         void readData();
         uint16_t& getData() {return *buffer_ADC;}
         int getSizeBuffer() const {return BUFFER_SIZE;}
+        int getReadBytes() const {return readBytes;}
     private:
         uint16_t buffer_ADC[BUFFER_SIZE];
+        int readBytes;
         int serial_port;
         termios tty,oldtty;
 

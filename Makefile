@@ -2,12 +2,13 @@ OUTPATH = build
 PROJECT = $(OUTPATH)/oscilloscope_gui
 
 CC = g++
-CFLAGS=-std=c++11 -Wall -o
+CFLAGS=-std=c++11 -Wall -lsfml-graphics -lsfml-window -lsfml-system -o
+
 
 .PHONY: dir all clean
 
-all: dir main.cpp TTY.cpp
-	$(CC) main.cpp TTY.cpp $(CFLAGS) $(PROJECT)
+all: dir TTY.cpp Screen.cpp Window.cpp main.cpp
+	$(CC) main.cpp TTY.cpp Screen.cpp Window.cpp $(CFLAGS) $(PROJECT)
 
 dir: ${OUTPATH}
 ${OUTPATH}: 

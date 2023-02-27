@@ -65,7 +65,7 @@ TTY::~TTY()
 void TTY::readData()
 {
         tcflush(serial_port,TCIFLUSH);
-        int num_bytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
+        readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
         //int readBytes = 0;
         //int numBytes = 0;
 
@@ -73,14 +73,14 @@ void TTY::readData()
         //{
          //   numBytes = read(serial_port,&buffer_ADC[readBytes],sizeof(buffer_ADC)-readBytes);
          //   std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            if (num_bytes <0)
+            if (readBytes <0)
                 {
                     perror("Error reading: ");
                     return;
                 }
-            else if (num_bytes == 0)
+            else if (readBytes == 0)
                 {
-                    perror("Not full reading buffer: ");
+                    perror("No data ");
                     return;
                 }
         //    readBytes +=numBytes;

@@ -1,10 +1,18 @@
 #include <iostream>
-#include "TTY.h"
+#include "Screen.h"
 #include <thread>
 
 int main()
 {
+    Screen screen;
     
+    while(screen.IsRunning())
+    {
+        screen.Update();
+        screen.Draw();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    /*
     TTY tty;
     tty.readData();
     int bufSize = tty.getSizeBuffer();
@@ -18,5 +26,6 @@ int main()
 
     }
     std::cout<<'\n';
+    */
     return 0;
 }
