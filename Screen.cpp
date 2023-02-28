@@ -12,17 +12,19 @@ Screen::Screen()
 
 void Screen::Update()
 {   
+    /*
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0,1023);
     uint16_t* ADC_buf = &ADC_Data.getData();
     for (int i=0;i<ADC_Data.getSizeBuffer();++i)
         {
-            //*ADC_buf = dist(gen);
-            *ADC_buf++ = i;
+            *ADC_buf++ = dist(gen);
+            //*ADC_buf++ = i;
             //ADC_buf++;
         }
-    //Screen::ReadDataTTY();
+    */
+    Screen::ReadDataTTY();
     Screen::convertADC_DataForScreen(&ADC_Data.getData());
     window.Update();
 }
@@ -38,6 +40,7 @@ bool Screen::IsRunning()
 {
     while (window.IsOpen())
         return true;
+    return false;
 }
 
 void Screen::ReadDataTTY()
@@ -52,6 +55,6 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
     for (int i=0;i<bufferSize;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(i*5+100,600-*bufferADC++/COEF-100);
+        graphLines[i].position = sf::Vector2f(i+100,600-*bufferADC++/COEF-100);
     }
 }

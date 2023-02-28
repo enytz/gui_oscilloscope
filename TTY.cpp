@@ -65,24 +65,27 @@ TTY::~TTY()
 void TTY::readData()
 {
         tcflush(serial_port,TCIFLUSH);
-        readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
-        //int readBytes = 0;
-        //int numBytes = 0;
+        //readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
+        int readBytes = 0;
+        int numBytes = 0;
 
-        //do
-        //{
-         //   numBytes = read(serial_port,&buffer_ADC[readBytes],sizeof(buffer_ADC)-readBytes);
+        do
+        {
+            numBytes = read(serial_port,&buffer_ADC[readBytes%2?readBytes:readBytes+1],sizeof(buffer_ADC)-readBytes);
          //   std::this_thread::sleep_for(std::chrono::milliseconds(1));
+         std::cout<<numBytes<<std::endl;
             if (readBytes <0)
                 {
                     perror("Error reading: ");
                     return;
                 }
-            else if (readBytes == 0)
+            else if (numBytes == 0)
                 {
                     perror("No data ");
                     return;
                 }
-        //    readBytes +=numBytes;
-       // }while(readBytes< BUFFER_SIZE*sizeof(buffer_ADC[0]) );
+            readBytes +=numBytes;
+        }while(readBytes < BUFFER_SIZE*sizeof(buffer_ADC[0]));
+        std::cout<<"---------------------------------------------------";
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

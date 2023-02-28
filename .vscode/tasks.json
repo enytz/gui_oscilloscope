@@ -9,7 +9,11 @@
                 "-g",
                // "${file}",
                "*.cpp",
+               "-lsfml-graphics",
+               "-lsfml-window",
+               "-lsfml-system",
                 "-o",
+
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
             "options": {
