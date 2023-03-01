@@ -6,6 +6,12 @@
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer())
 {
+    oXoY.setPosition(100,100);
+    oXoY.setSize(sf::Vector2f(1000,400));
+    oXoY.setOutlineColor(sf::Color::Black);
+    oXoY.setOutlineThickness(2);
+    //oXoY.setFillColor(sf::Color::Cyan);
+
     if (!font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"))
             std::cout<<"Error reading font"<<std::endl;
 }
@@ -32,6 +38,7 @@ void Screen::Update()
 void Screen::Draw()
 {
     window.BeginDraw();
+    window.Draw(oXoY);
     window.Draw(graphLines);
     window.EndDraw();
 }

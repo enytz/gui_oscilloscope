@@ -11,8 +11,8 @@ TTY::TTY()
         buffer[i] = 0;
     }
 
-    //serial_port = open("/dev/ttyUSB0",O_RDONLY);
-    serial_port = open("/dev/ttyACM0",O_RDONLY);
+    serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    //serial_port = open("/dev/ttyACM0",O_RDONLY);
     // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
     if (tcgetattr(serial_port,&tty) !=0)
     {
@@ -70,16 +70,31 @@ TTY::~TTY()
 void TTY::readData()
 {
         tcflush(serial_port,TCIFLUSH);
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        //int readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
         int readBytes = 0;
         int numBytes = 0;
         int sizeOfBuffer = BUFFER_SIZE*2;
-        
+
+        uint8_t controlSequence[4]{0xba,0xba, 0xad, 0xde};
+        int counter =0;
+    while (counter<4)
+        {
+            numBytes = read(serial_port,&buffer[counter],1);
+            if (numBytes <0)
+                {
+                    perror("Error reading: ");
+                    return;
+                }
+            if (buffer[counter] == controlSequence[counter])
+                {
+                counter++;
+                }
+        }
+        tcflush(serial_port,TCIFLUSH);
         do
         {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             numBytes = read(serial_port,&buffer[readBytes],sizeOfBuffer-readBytes);
-            std::cout<<numBytes<<std::endl;
+            std::cout<<numBytes<<' ';
             if (numBytes <0)
                 {
                     perror("Error reading: ");
@@ -92,10 +107,10 @@ void TTY::readData()
                 }
             readBytes +=numBytes;
         }while(readBytes < sizeOfBuffer);
+        std::cout<<'\n';
         for (int i=0;i<BUFFER_SIZE;++i)
         {
-            buffer_ADC[i] = (uint16_t)(buffer[2*i] | (buffer[2*i+1]<<8));
+            buffer_ADC[i] = (uint16_t)(buffer[2*i]<<8 | (buffer[2*i+1]));
         }
         std::cout<<"---------------------------------------------------\n";
-        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
