@@ -45,7 +45,6 @@ bool Screen::IsRunning()
 
 void Screen::ReadDataTTY()
 {
-    // add case not all reading data ( sizebuffer != num_bytes)
     ADC_Data.readData();
 }
 
@@ -55,6 +54,6 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
     for (int i=0;i<bufferSize;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(i+100,600-*bufferADC++/COEF-100);
+        graphLines[i].position = sf::Vector2f(2*i+100,600-*bufferADC++/COEF-100);
     }
 }

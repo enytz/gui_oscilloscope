@@ -6,8 +6,13 @@ TTY::TTY()
     {
         buffer_ADC[i] = 0;
     }
+    for (int i=0;i<BUFFER_SIZE*2;++i)
+    {
+        buffer[i] = 0;
+    }
 
-    serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    //serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    serial_port = open("/dev/ttyACM0",O_RDONLY);
     // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
     if (tcgetattr(serial_port,&tty) !=0)
     {
@@ -41,7 +46,7 @@ TTY::TTY()
     tty.c_oflag &= ~ONLCR;  // prevent conversion of newline to carriage return/line feed
 
     // setting time delay for waiting data
-    tty.c_cc[VTIME] = 10;      // wait for up 1s (10*100ms), 100 ms =1
+    tty.c_cc[VTIME] = 1;      // wait for up 1s (10*100ms), 100 ms =1
     tty.c_cc[VMIN] = sizeof(BUFFER_SIZE*sizeof(buffer_ADC[0]));
 
     cfsetispeed(&tty,B115200);
@@ -65,16 +70,17 @@ TTY::~TTY()
 void TTY::readData()
 {
         tcflush(serial_port,TCIFLUSH);
-        //readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //int readBytes = read(serial_port,&buffer_ADC,sizeof(buffer_ADC));
         int readBytes = 0;
         int numBytes = 0;
-
+        int sizeOfBuffer = BUFFER_SIZE*2;
+        
         do
         {
-            numBytes = read(serial_port,&buffer_ADC[readBytes%2?readBytes:readBytes+1],sizeof(buffer_ADC)-readBytes);
-         //   std::this_thread::sleep_for(std::chrono::milliseconds(1));
-         std::cout<<numBytes<<std::endl;
-            if (readBytes <0)
+            numBytes = read(serial_port,&buffer[readBytes],sizeOfBuffer-readBytes);
+            std::cout<<numBytes<<std::endl;
+            if (numBytes <0)
                 {
                     perror("Error reading: ");
                     return;
@@ -82,10 +88,14 @@ void TTY::readData()
             else if (numBytes == 0)
                 {
                     perror("No data ");
-                    return;
+                    //return;
                 }
             readBytes +=numBytes;
-        }while(readBytes < BUFFER_SIZE*sizeof(buffer_ADC[0]));
-        std::cout<<"---------------------------------------------------";
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }while(readBytes < sizeOfBuffer);
+        for (int i=0;i<BUFFER_SIZE;++i)
+        {
+            buffer_ADC[i] = (uint16_t)(buffer[2*i] | (buffer[2*i+1]<<8));
+        }
+        std::cout<<"---------------------------------------------------\n";
+        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

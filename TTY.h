@@ -9,7 +9,7 @@
 //#include <memory>
 //#include <atomic>
 //#include <thread>
-#define BUFFER_SIZE 500
+#define BUFFER_SIZE 250
 
 #include <iostream>
 
@@ -24,10 +24,11 @@ struct TTY
         int getReadBytes() const {return readBytes;}
     private:
         uint16_t buffer_ADC[BUFFER_SIZE];
+        uint8_t buffer[BUFFER_SIZE*2];
+
         int readBytes;
         int serial_port;
         termios tty,oldtty;
-
 };
 
 
