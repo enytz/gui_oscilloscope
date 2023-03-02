@@ -11,8 +11,8 @@ TTY::TTY()
         buffer[i] = 0;
     }
 
-    //serial_port = open("/dev/ttyUSB0",O_RDONLY);
-    serial_port = open("/dev/ttyACM0",O_RDONLY);
+    serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    //serial_port = open("/dev/ttyACM0",O_RDONLY);
     // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
     if (tcgetattr(serial_port,&tty) !=0)
     {
@@ -62,6 +62,7 @@ TTY::TTY()
 TTY::~TTY()
 {
     tcsetattr(serial_port,TCSANOW, &oldtty);
+    tcflush(serial_port,TCIFLUSH);
     close(serial_port);
     //std::cout<<"~tty";
     //std::cout.flush();
@@ -93,8 +94,7 @@ void TTY::readData()
                     counter =0;
                 }
         }
-        //tcflush(serial_port,TCIFLUSH);
-        do
+    do
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
             numBytes = read(serial_port,&buffer[readBytes],sizeOfBuffer-readBytes);
@@ -114,7 +114,7 @@ void TTY::readData()
         std::cout<<'\n';
         for (int i=0;i<BUFFER_SIZE;++i)
         {
-            buffer_ADC[i] = (uint16_t)(buffer[2*i]<<8 | (buffer[2*i+1]));
+            buffer_ADC[i] = (uint16_t)(buffer[2*i] | (buffer[2*i+1]<<8));
         }
         std::cout<<"---------------------------------------------------\n";
 }

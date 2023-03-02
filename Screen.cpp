@@ -7,7 +7,7 @@ Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer())
 {
     oXoY.setPosition(100,100);
-    oXoY.setSize(sf::Vector2f(800,400));
+    oXoY.setSize(sf::Vector2f(1000,400));
     oXoY.setOutlineColor(sf::Color::Black);
     oXoY.setOutlineThickness(2);
     if (!font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"))
@@ -59,6 +59,6 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
     for (int i=0;i<bufferSize;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(4*i+100,600-*bufferADC++/COEF-100);
+        graphLines[i].position = sf::Vector2f(10*i+100,600-*bufferADC++/COEF-100);
     }
 }

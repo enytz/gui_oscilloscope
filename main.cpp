@@ -2,7 +2,6 @@
 #include "Screen.h"
 #include <thread>
 
-#define MASSIZE 12
 int main()
 {
     Screen screen;

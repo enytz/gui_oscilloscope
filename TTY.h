@@ -9,7 +9,7 @@
 //#include <memory>
 //#include <atomic>
 //#include <thread>
-#define BUFFER_SIZE 200
+#define BUFFER_SIZE 500
 
 #include <iostream>
 
