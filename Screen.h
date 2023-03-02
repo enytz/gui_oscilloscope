@@ -36,6 +36,7 @@ private:
     Window window;
     sf::VertexArray graphLines;
     sf::RectangleShape oXoY;
+    //sf::VertexArray gridVert;
     TTY ADC_Data;
     void convertADC_DataForScreen(uint16_t* bufferADC);
     sf::Font font;

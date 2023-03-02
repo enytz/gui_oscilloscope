@@ -11,8 +11,8 @@ TTY::TTY()
         buffer[i] = 0;
     }
 
-    serial_port = open("/dev/ttyUSB0",O_RDONLY);
-    //serial_port = open("/dev/ttyACM0",O_RDONLY);
+    //serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    serial_port = open("/dev/ttyACM0",O_RDONLY);
     // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
     if (tcgetattr(serial_port,&tty) !=0)
     {
@@ -74,7 +74,7 @@ void TTY::readData()
         int numBytes = 0;
         int sizeOfBuffer = BUFFER_SIZE*2;
 
-        uint8_t controlSequence[4]{0xba,0xba, 0xad, 0xde};
+        uint8_t controlSequence[4]{0xde, 0xad, 0xba, 0xba};
         int counter =0;
     while (counter<4)
         {
@@ -86,10 +86,14 @@ void TTY::readData()
                 }
             if (buffer[counter] == controlSequence[counter])
                 {
-                counter++;
+                    counter++;
+                }
+            else
+                {
+                    counter =0;
                 }
         }
-        tcflush(serial_port,TCIFLUSH);
+        //tcflush(serial_port,TCIFLUSH);
         do
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
