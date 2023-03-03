@@ -5,7 +5,7 @@
 #include <string>
 
 #define SIZE_HOR 1200
-#define SIZE_VERT 600
+#define SIZE_VERT 700
 class Window
 {
     public:

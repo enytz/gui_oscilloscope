@@ -4,12 +4,25 @@
 #include <random>
 
 Screen::Screen()
-    : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer())
+    : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer()), gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
+        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT))
 {
-    oXoY.setPosition(100,100);
-    oXoY.setSize(sf::Vector2f(1000,400));
-    oXoY.setOutlineColor(sf::Color::Black);
-    oXoY.setOutlineThickness(2);
+    
+    for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
+    {
+        gridOx[2*i].color = sf::Color::Black;
+        gridOx[2*i+1].color = sf::Color::Black;
+        gridOx[2*i].position = sf::Vector2f(100,i==0?100:100+STEP*i);
+        gridOx[2*i+1].position = sf::Vector2f(WINDOW_GRID_SIZE_HOR,i==0?100:100+STEP*i);
+    }
+
+    for (int i=0;i<NUMBER_OF_LINES_VERT/2;++i)
+    {
+        gridOy[2*i].color = sf::Color::Black;
+        gridOy[2*i+1].color = sf::Color::Black;
+        gridOy[2*i].position = sf::Vector2f(i==0?100:100+STEP*i,100);
+        gridOy[2*i+1].position = sf::Vector2f(i==0?100:100+STEP*i,WINDOW_GRID_SIZE_VERT+100);
+    }
     if (!font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"))
             std::cout<<"Error reading font"<<std::endl;
 }
@@ -36,7 +49,9 @@ void Screen::Update()
 void Screen::Draw()
 {
     window.BeginDraw();
-    window.Draw(oXoY);
+    //window.Draw(oXoY);
+    window.Draw(gridOx);
+    window.Draw(gridOy);
     window.Draw(graphLines);
     window.EndDraw();
 }
@@ -59,6 +74,6 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
     for (int i=0;i<bufferSize;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(10*i+100,600-*bufferADC++/COEF-100);
+        graphLines[i].position = sf::Vector2f(2*i+100,SIZE_VERT-*bufferADC++/COEF-100);
     }
 }
