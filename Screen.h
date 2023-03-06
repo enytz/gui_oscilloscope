@@ -4,7 +4,7 @@
 #include "Window.h"
 #include "TTY.h"
 
-#define STEP                    100
+#define STEP                    50
 #define WINDOW_GRID_SIZE_VERT   500
 #define WINDOW_GRID_SIZE_HOR    1000
 #define NUMBER_OF_LINES_VERT    (WINDOW_GRID_SIZE_HOR/STEP*2)
@@ -29,6 +29,10 @@
     #define COEF            0.51
 #endif
 
+void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,
+                         const float posX, const float posY, const unsigned int size = 30,
+                          sf::Color color = sf::Color::Black);
+
 class Screen
 {   
 public:
@@ -46,6 +50,9 @@ private:
     TTY ADC_Data;
     void convertADC_DataForScreen(uint16_t* bufferADC);
     sf::Font font;
+    sf::Text frequency;
+    sf::Text amplitude;
+    sf::Text period;
 };
 
 

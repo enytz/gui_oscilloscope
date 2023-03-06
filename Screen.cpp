@@ -43,15 +43,22 @@ void Screen::Update()
     */
     Screen::ReadDataTTY();
     Screen::convertADC_DataForScreen(&ADC_Data.getData());
+
+    setStringOnDisplay(amplitude,font,"ampl:",120,610,20);
+    setStringOnDisplay(frequency,font,"freq:",250,610,20);
+    setStringOnDisplay(period,font,"T:",380,610,20);
+
     window.Update();
 }
 
 void Screen::Draw()
 {
     window.BeginDraw();
-    //window.Draw(oXoY);
     window.Draw(gridOx);
     window.Draw(gridOy);
+    window.Draw(amplitude);
+    window.Draw(frequency);
+    window.Draw(period);
     window.Draw(graphLines);
     window.EndDraw();
 }
@@ -76,4 +83,18 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
         graphLines[i].color = sf::Color::Blue;
         graphLines[i].position = sf::Vector2f(2*i+100,SIZE_VERT-*bufferADC++/COEF-100);
     }
+}
+
+void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,
+                         const float posX, const float posY, const unsigned int size,
+                          sf::Color color)
+{
+    text.setFont(font);
+    text.setString(str);
+    text.setCharacterSize(size);
+    text.setFillColor(color);
+    sf::Vector2f position;
+    position.x = posX;
+    position.y = posY;
+    text.setPosition(position);
 }
