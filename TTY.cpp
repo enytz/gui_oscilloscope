@@ -38,11 +38,10 @@ TTY::TTY()
     tty.c_lflag &= ~ECHONL; // disable new-line echo
     tty.c_lflag &= ~ISIG;   // disable interpretation of INTR, QUIT and SUSP
 
-    //tty.c_iflag &= ~(IXON | IXANY); //turn off s/w flow ctrl
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); //turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL);
 
-    tty.c_oflag &= ~OPOST;  // prevent special interpretator of output bytes
+    tty.c_oflag &= ~OPOST;  // prevent special interpretator of output bytes - output is raw data
     tty.c_oflag &= ~ONLCR;  // prevent conversion of newline to carriage return/line feed
 
     // setting time delay for waiting data
@@ -117,4 +116,30 @@ void TTY::readData()
             buffer_ADC[i] = (uint16_t)(buffer[2*i] | (buffer[2*i+1]<<8));
         }
         std::cout<<"---------------------------------------------------\n";
+}
+
+void TTY::readyReceiveData()
+{
+    uint8_t word[5]{'r','e','a','d','y'};
+    int numWritingBytes = write(serial_port,&word,sizeof(word[0])*5);
+    if (numWritingBytes < 0)
+        {
+            perror("Error transmit: ");
+        }
+}
+
+uint16_t TTY::offsetWithTrig()
+{
+    uint16_t preTrigValue = BUFFER_SIZE/2;
+    uint16_t trigVal = 800;
+    //bool flag =0;
+    for (int i=preTrigValue;i<BUFFER_SIZE;++i)
+    {
+        if (buffer_ADC[i]> trigVal)
+            return BUFFER_SIZE/2 -i;
+      //  else 
+        //    flag =1;
+        
+    }
+    return 0;
 }

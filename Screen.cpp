@@ -42,8 +42,8 @@ void Screen::Update()
         }
     */
     Screen::ReadDataTTY();
-    Screen::convertADC_DataForScreen(&ADC_Data.getData());
-
+    Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
+    ADC_Data.readyReceiveData();
     setStringOnDisplay(amplitude,font,"ampl:",120,610,20);
     setStringOnDisplay(frequency,font,"freq:",250,610,20);
     setStringOnDisplay(period,font,"T:",380,610,20);
@@ -77,8 +77,18 @@ void Screen::ReadDataTTY()
 
 void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 {
+    /*
     int bufferSize = ADC_Data.getSizeBuffer();
     for (int i=0;i<bufferSize;++i)
+    {
+        graphLines[i].color = sf::Color::Blue;
+        graphLines[i].position = sf::Vector2f(5*i+100,SIZE_VERT-*bufferADC++/COEF-100);
+    }
+    */
+    int offset = ADC_Data.offsetWithTrig();
+    bufferADC += offset;
+    int bufferSize = ADC_Data.getSizeBuffer();
+    for (int i=0;i<bufferSize-offset;++i)
     {
         graphLines[i].color = sf::Color::Blue;
         graphLines[i].position = sf::Vector2f(2*i+100,SIZE_VERT-*bufferADC++/COEF-100);

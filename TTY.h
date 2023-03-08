@@ -9,7 +9,7 @@
 //#include <memory>
 //#include <atomic>
 //#include <thread>
-#define BUFFER_SIZE 500
+#define BUFFER_SIZE 400
 
 #include <iostream>
 
@@ -19,9 +19,12 @@ struct TTY
         TTY();
         ~TTY();
         void readData();
+        void readyReceiveData();
         uint16_t& getData() {return *buffer_ADC;}
         int getSizeBuffer() const {return BUFFER_SIZE;}
         int getReadBytes() const {return readBytes;}
+
+        uint16_t offsetWithTrig();
     private:
         uint16_t buffer_ADC[BUFFER_SIZE];
         uint8_t buffer[BUFFER_SIZE*2];
