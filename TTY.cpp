@@ -11,7 +11,7 @@ TTY::TTY()
         buffer[i] = 0;
     }
 
-    serial_port = open("/dev/ttyUSB0",O_RDONLY);
+    serial_port = open("/dev/ttyUSB0",O_RDWR);
     //serial_port = open("/dev/ttyACM0",O_RDONLY);
     // https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
     if (tcgetattr(serial_port,&tty) !=0)
@@ -69,13 +69,13 @@ TTY::~TTY()
 
 void TTY::readData()
 {
-        tcflush(serial_port,TCIFLUSH);
-        int readBytes = 0;
-        int numBytes = 0;
-        int sizeOfBuffer = BUFFER_SIZE*2;
+    tcflush(serial_port,TCIFLUSH);
+    int readBytes = 0;
+    int numBytes = 0;
+    int sizeOfBuffer = BUFFER_SIZE*2;
 
-        uint8_t controlSequence[4]{0xde, 0xad, 0xba, 0xba};
-        int counter =0;
+    uint8_t controlSequence[4]{0xde, 0xad, 0xba, 0xba};
+    int counter =0;
     while (counter<4)
         {
             numBytes = read(serial_port,&buffer[counter],1);
@@ -110,22 +110,29 @@ void TTY::readData()
                 }
             readBytes +=numBytes;
         }while(readBytes < sizeOfBuffer);
-        std::cout<<'\n';
-        for (int i=0;i<BUFFER_SIZE;++i)
+    std::cout<<'\n';
+    for (int i=0;i<BUFFER_SIZE;++i)
         {
             buffer_ADC[i] = (uint16_t)(buffer[2*i] | (buffer[2*i+1]<<8));
         }
-        std::cout<<"---------------------------------------------------\n";
+    std::cout<<"---------------------------------------------------\n";
 }
 
 void TTY::readyReceiveData()
 {
     uint8_t word[5]{'r','e','a','d','y'};
-    int numWritingBytes = write(serial_port,&word,sizeof(word[0])*5);
-    if (numWritingBytes < 0)
-        {
-            perror("Error transmit: ");
-        }
+    int numWritingBytes = 0;
+    int numBytes =0;
+    do
+    {
+        numBytes = write(serial_port,&word,sizeof(word[0])*5);
+        if (numWritingBytes < 0)
+            {
+                perror("Error transmit: ");
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        numWritingBytes += numBytes;
+    }while(numWritingBytes < 5);
 }
 
 uint16_t TTY::offsetWithTrig()
@@ -136,7 +143,7 @@ uint16_t TTY::offsetWithTrig()
     for (int i=preTrigValue;i<BUFFER_SIZE;++i)
     {
         if (buffer_ADC[i]> trigVal)
-            return BUFFER_SIZE/2 -i;
+            return i-BUFFER_SIZE/2;
       //  else 
         //    flag =1;
         

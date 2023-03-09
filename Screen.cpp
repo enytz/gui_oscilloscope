@@ -1,7 +1,7 @@
 #include "Screen.h"
 #include <thread>
 
-#include <random>
+//#include <random>
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer()), gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
@@ -32,7 +32,7 @@ void Screen::Update()
     /*
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0,1023);
+    std::uniform_int_distribution<> dist(0,50);
     uint16_t* ADC_buf = &ADC_Data.getData();
     for (int i=0;i<ADC_Data.getSizeBuffer();++i)
         {
@@ -41,9 +41,11 @@ void Screen::Update()
             //ADC_buf++;
         }
     */
+
     Screen::ReadDataTTY();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
     ADC_Data.readyReceiveData();
+
     setStringOnDisplay(amplitude,font,"ampl:",120,610,20);
     setStringOnDisplay(frequency,font,"freq:",250,610,20);
     setStringOnDisplay(period,font,"T:",380,610,20);
@@ -85,6 +87,7 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
         graphLines[i].position = sf::Vector2f(5*i+100,SIZE_VERT-*bufferADC++/COEF-100);
     }
     */
+   
     int offset = ADC_Data.offsetWithTrig();
     bufferADC += offset;
     int bufferSize = ADC_Data.getSizeBuffer();
@@ -93,6 +96,7 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
         graphLines[i].color = sf::Color::Blue;
         graphLines[i].position = sf::Vector2f(2*i+100,SIZE_VERT-*bufferADC++/COEF-100);
     }
+    
 }
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,

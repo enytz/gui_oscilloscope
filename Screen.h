@@ -38,7 +38,6 @@ class Screen
 public:
     Screen();
     void Update();
-    //void LateUpdate();
     void Draw();
     bool IsRunning();
     void ReadDataTTY();
