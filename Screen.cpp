@@ -1,7 +1,6 @@
 #include "Screen.h"
 #include <thread>
 
-//#include <random>
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer()), gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
@@ -41,16 +40,22 @@ void Screen::Update()
             //ADC_buf++;
         }
     */
+   //while(1)
+   //{
+   // ADC_Data.readyReceiveData();
+   // std::this_thread::sleep_for(std::chrono::milliseconds(10));
+   //}
 
-    Screen::ReadDataTTY();
+    //Screen::ReadDataTTY();
+    ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
-    ADC_Data.readyReceiveData();
 
-    setStringOnDisplay(amplitude,font,"ampl:",120,610,20);
-    setStringOnDisplay(frequency,font,"freq:",250,610,20);
-    setStringOnDisplay(period,font,"T:",380,610,20);
+    setStringOnDisplay(amplitude,font,"ampl: ",120,610,20);
+    setStringOnDisplay(frequency,font,"freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData())))+" Hz",250,610,20);
+    setStringOnDisplay(period,font,"T: "+std::to_string(1/frequencyCalc(&(ADC_Data.getData()))*1000)+" ms",500,610,20);
 
     window.Update();
+   // ADC_Data.readyReceiveData();
 }
 
 void Screen::Draw()
@@ -79,24 +84,40 @@ void Screen::ReadDataTTY()
 
 void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 {
-    /*
-    int bufferSize = ADC_Data.getSizeBuffer();
-    for (int i=0;i<bufferSize;++i)
-    {
-        graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(5*i+100,SIZE_VERT-*bufferADC++/COEF-100);
-    }
-    */
-   
     int offset = ADC_Data.offsetWithTrig();
     bufferADC += offset;
     int bufferSize = ADC_Data.getSizeBuffer();
+    int coef = 5;
     for (int i=0;i<bufferSize-offset;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(2*i+100,SIZE_VERT-*bufferADC++/COEF-100);
+        graphLines[i].position = sf::Vector2f(coef*i+100,SIZE_VERT-bufferADC[i]/COEF-100);
     }
-    
+}
+
+float Screen::frequencyCalc(uint16_t* bufferADC)
+{
+    int startPoint =BUFFER_SIZE/10;
+    int endpoint = BUFFER_SIZE - startPoint-1;
+    int trigVal =ADC_Data.getTrigValue();
+    float numCyclesADC = 1.5;
+    bool flagRising1 = 0;
+    int valFlagR1    = 0;
+    int valFlagR2    = 0;
+    for (int i=startPoint;i<endpoint;++i)
+    {
+        if (bufferADC[i] <trigVal && bufferADC[i+1] > trigVal && flagRising1)
+        {
+            valFlagR2 = i;
+            return 1/((valFlagR2-valFlagR1)*0.000000928);
+        }
+        if (bufferADC[i] < trigVal && bufferADC[i+1] > trigVal)
+        {
+            flagRising1 =1;
+            valFlagR1 = i;
+        }
+    }
+    return 0;
 }
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,

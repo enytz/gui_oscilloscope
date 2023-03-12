@@ -6,12 +6,13 @@
 #include <termios.h>    // Contains POSIX terminal control definitions
 #include <unistd.h>     // write(), read(), close()
 
-//#include <memory>
-//#include <atomic>
-//#include <thread>
-#define BUFFER_SIZE 400
+#include <math.h>       // generate pseudo data
+
+#define BUFFER_SIZE 200
+#define TRIG_VALUE  500
 
 #include <iostream>
+#include <random>
 
 struct TTY
 {
@@ -22,18 +23,21 @@ struct TTY
         void readyReceiveData();
         uint16_t& getData() {return *buffer_ADC;}
         int getSizeBuffer() const {return BUFFER_SIZE;}
-        int getReadBytes() const {return readBytes;}
-
+        //int getReadBytes() const {return readBytes;}
+        int getTrigValue() const {return trigValue;}
+        void setTrigValue(int val) {trigValue = val;}
         uint16_t offsetWithTrig();
+
+        void pseudo_data();
     private:
+
         uint16_t buffer_ADC[BUFFER_SIZE];
         uint8_t buffer[BUFFER_SIZE*2];
 
-        int readBytes;
+        int trigValue;
+        //int readBytes;
         int serial_port;
         termios tty,oldtty;
 };
-
-
 
 #endif

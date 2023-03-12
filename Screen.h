@@ -3,6 +3,8 @@
 
 #include "Window.h"
 #include "TTY.h"
+#include <string>
+
 
 #define STEP                    50
 #define WINDOW_GRID_SIZE_VERT   500
@@ -48,6 +50,7 @@ private:
     sf::VertexArray gridOy;
     TTY ADC_Data;
     void convertADC_DataForScreen(uint16_t* bufferADC);
+    float frequencyCalc(uint16_t* bufferADC);
     sf::Font font;
     sf::Text frequency;
     sf::Text amplitude;

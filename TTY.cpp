@@ -1,6 +1,7 @@
 #include "TTY.h"
 #include <thread>
 TTY::TTY()
+    :trigValue(TRIG_VALUE)
 {
     for (int i=0;i<BUFFER_SIZE;++i)
     {
@@ -63,8 +64,6 @@ TTY::~TTY()
     tcsetattr(serial_port,TCSANOW, &oldtty);
     tcflush(serial_port,TCIFLUSH);
     close(serial_port);
-    //std::cout<<"~tty";
-    //std::cout.flush();
 }
 
 void TTY::readData()
@@ -106,7 +105,6 @@ void TTY::readData()
             else if (numBytes == 0)
                 {
                     perror("No data ");
-                    //return;
                 }
             readBytes +=numBytes;
         }while(readBytes < sizeOfBuffer);
@@ -120,33 +118,48 @@ void TTY::readData()
 
 void TTY::readyReceiveData()
 {
-    uint8_t word[5]{'r','e','a','d','y'};
+    uint8_t word{'r'};
     int numWritingBytes = 0;
     int numBytes =0;
     do
     {
-        numBytes = write(serial_port,&word,sizeof(word[0])*5);
+        numBytes = write(serial_port,&word,sizeof(word));
+        numWritingBytes += numBytes;
         if (numWritingBytes < 0)
             {
                 perror("Error transmit: ");
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
-        numWritingBytes += numBytes;
-    }while(numWritingBytes < 5);
+    }while(numWritingBytes < 1);
+    std::cout<<"Request transfer is complited\n";
 }
 
 uint16_t TTY::offsetWithTrig()
 {
-    uint16_t preTrigValue = BUFFER_SIZE/2;
-    uint16_t trigVal = 800;
-    //bool flag =0;
+    uint16_t preTrigValue = BUFFER_SIZE/4;
+    bool flag =0;
     for (int i=preTrigValue;i<BUFFER_SIZE;++i)
     {
-        if (buffer_ADC[i]> trigVal)
-            return i-BUFFER_SIZE/2;
-      //  else 
-        //    flag =1;
+        if (buffer_ADC[i-1] < trigValue && buffer_ADC[i]> trigValue)
+            flag =1;
+        if (buffer_ADC[i]> trigValue && flag)
+            return i-BUFFER_SIZE/4;
         
     }
     return 0;
+}
+
+void TTY::pseudo_data()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0,360);
+    float dt = BUFFER_SIZE/360.0;
+    int Ampl = 1023;
+    int f    = 5;
+    int fi = M_PI*dist(gen)/180;
+    for(int i=0;i<BUFFER_SIZE;++i)
+    {
+        buffer_ADC[i] = Ampl/2*sin(2*M_PI*dt*i*f/180+fi)+Ampl/2;      //sin
+    }
 }

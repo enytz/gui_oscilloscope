@@ -5,7 +5,7 @@
 int main()
 {
     Screen screen;
-    
+
     while(screen.IsRunning())
     {
         screen.Update();
