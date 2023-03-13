@@ -1,5 +1,6 @@
 #include "TTY.h"
 #include <thread>
+
 TTY::TTY()
     :trigValue(TRIG_VALUE)
 {
@@ -155,8 +156,8 @@ void TTY::pseudo_data()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0,360);
     float dt = BUFFER_SIZE/360.0;
-    int Ampl = 1023;
-    int f    = 5;
+    int Ampl = 1000;
+    int f    = 10;
     int fi = M_PI*dist(gen)/180;
     for(int i=0;i<BUFFER_SIZE;++i)
     {

@@ -7,12 +7,12 @@
 #include <unistd.h>     // write(), read(), close()
 
 #include <math.h>       // generate pseudo data
+#include <random>
 
 #define BUFFER_SIZE 200
 #define TRIG_VALUE  500
 
 #include <iostream>
-#include <random>
 
 struct TTY
 {
@@ -23,7 +23,6 @@ struct TTY
         void readyReceiveData();
         uint16_t& getData() {return *buffer_ADC;}
         int getSizeBuffer() const {return BUFFER_SIZE;}
-        //int getReadBytes() const {return readBytes;}
         int getTrigValue() const {return trigValue;}
         void setTrigValue(int val) {trigValue = val;}
         uint16_t offsetWithTrig();
@@ -35,7 +34,6 @@ struct TTY
         uint8_t buffer[BUFFER_SIZE*2];
 
         int trigValue;
-        //int readBytes;
         int serial_port;
         termios tty,oldtty;
 };

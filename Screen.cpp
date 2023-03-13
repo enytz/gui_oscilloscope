@@ -3,24 +3,24 @@
 
 
 Screen::Screen()
-    : window("No name"), graphLines(sf::PrimitiveType::LineStrip,ADC_Data.getSizeBuffer()), gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
+    : window("No name"), graphLines(sf::PrimitiveType::LineStrip),gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
         gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT))
 {
     
     for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
     {
-        gridOx[2*i].color = sf::Color::Black;
-        gridOx[2*i+1].color = sf::Color::Black;
-        gridOx[2*i].position = sf::Vector2f(100,i==0?100:100+STEP*i);
-        gridOx[2*i+1].position = sf::Vector2f(WINDOW_GRID_SIZE_HOR,i==0?100:100+STEP*i);
+        gridOx[2*i].color = sf::Color(128,128,128);
+        gridOx[2*i+1].color = sf::Color(128,128,128);
+        gridOx[2*i].position = sf::Vector2f(100,i==0?100:100+STEPVERT*i);
+        gridOx[2*i+1].position = sf::Vector2f(WINDOW_GRID_SIZE_HOR,i==0?100:100+STEPVERT*i);
     }
 
-    for (int i=0;i<NUMBER_OF_LINES_VERT/2;++i)
+    for (int i=0;i<NUMBER_OF_LINES_VERT/2-1;++i)
     {
-        gridOy[2*i].color = sf::Color::Black;
-        gridOy[2*i+1].color = sf::Color::Black;
-        gridOy[2*i].position = sf::Vector2f(i==0?100:100+STEP*i,100);
-        gridOy[2*i+1].position = sf::Vector2f(i==0?100:100+STEP*i,WINDOW_GRID_SIZE_VERT+100);
+        gridOy[2*i].color = sf::Color(128,128,128);
+        gridOy[2*i+1].color = sf::Color(128,128,128);
+        gridOy[2*i].position = sf::Vector2f(i==0?100:100+STEPHOR*i,100);
+        gridOy[2*i+1].position = sf::Vector2f(i==0?100:100+STEPHOR*i,WINDOW_GRID_SIZE_VERT+100);
     }
     if (!font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"))
             std::cout<<"Error reading font"<<std::endl;
@@ -28,31 +28,13 @@ Screen::Screen()
 
 void Screen::Update()
 {   
-    /*
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0,50);
-    uint16_t* ADC_buf = &ADC_Data.getData();
-    for (int i=0;i<ADC_Data.getSizeBuffer();++i)
-        {
-            *ADC_buf++ = dist(gen);
-            //*ADC_buf++ = i;
-            //ADC_buf++;
-        }
-    */
-   //while(1)
-   //{
-   // ADC_Data.readyReceiveData();
-   // std::this_thread::sleep_for(std::chrono::milliseconds(10));
-   //}
-
+    
     //Screen::ReadDataTTY();
     ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
 
-    setStringOnDisplay(amplitude,font,"ampl: ",120,610,20);
-    setStringOnDisplay(frequency,font,"freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData())))+" Hz",250,610,20);
-    setStringOnDisplay(period,font,"T: "+std::to_string(1/frequencyCalc(&(ADC_Data.getData()))*1000)+" ms",500,610,20);
+    setStringOnDisplay(frequency,font,"Freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData()))/1000)+" kHz",120,610,20,sf::Color::White);
+    setStringOnDisplay(period,font,"T: "+std::to_string(1/frequencyCalc(&(ADC_Data.getData()))*1000)+" ms",450,610,20,sf::Color::White);
 
     window.Update();
    // ADC_Data.readyReceiveData();
@@ -63,7 +45,6 @@ void Screen::Draw()
     window.BeginDraw();
     window.Draw(gridOx);
     window.Draw(gridOy);
-    window.Draw(amplitude);
     window.Draw(frequency);
     window.Draw(period);
     window.Draw(graphLines);
@@ -87,6 +68,9 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
     int offset = ADC_Data.offsetWithTrig();
     bufferADC += offset;
     int bufferSize = ADC_Data.getSizeBuffer();
+
+    graphLines.resize(bufferSize-offset);
+
     int coef = 5;
     for (int i=0;i<bufferSize-offset;++i)
     {
@@ -97,19 +81,21 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 
 float Screen::frequencyCalc(uint16_t* bufferADC)
 {
-    int startPoint =BUFFER_SIZE/10;
-    int endpoint = BUFFER_SIZE - startPoint-1;
-    int trigVal =ADC_Data.getTrigValue();
-    float numCyclesADC = 1.5;
-    bool flagRising1 = 0;
-    int valFlagR1    = 0;
-    int valFlagR2    = 0;
+    int startPoint      = BUFFER_SIZE/10;
+    int endpoint        = BUFFER_SIZE - startPoint-1;
+    int trigVal         = ADC_Data.getTrigValue();
+    float numCyclesADC  = 1.5;
+    float timeSampl     = 0.000000821;
+    float timeConversion= timeSampl+numCyclesADC*(1.0/14000000);
+    bool flagRising1    = 0;
+    int valFlagR1       = 0;
+    int valFlagR2       = 0;
     for (int i=startPoint;i<endpoint;++i)
     {
         if (bufferADC[i] <trigVal && bufferADC[i+1] > trigVal && flagRising1)
         {
             valFlagR2 = i;
-            return 1/((valFlagR2-valFlagR1)*0.000000928);
+            return 1/((valFlagR2-valFlagR1)*timeConversion);
         }
         if (bufferADC[i] < trigVal && bufferADC[i+1] > trigVal)
         {

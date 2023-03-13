@@ -6,11 +6,12 @@
 #include <string>
 
 
-#define STEP                    50
+#define STEPHOR                 50
+#define STEPVERT                50
 #define WINDOW_GRID_SIZE_VERT   500
 #define WINDOW_GRID_SIZE_HOR    1000
-#define NUMBER_OF_LINES_VERT    (WINDOW_GRID_SIZE_HOR/STEP*2)
-#define NUMBER_OF_LINES_HOR     ((WINDOW_GRID_SIZE_VERT/STEP+1)*2)
+#define NUMBER_OF_LINES_VERT    (WINDOW_GRID_SIZE_HOR/STEPHOR*2)
+#define NUMBER_OF_LINES_HOR     ((WINDOW_GRID_SIZE_VERT/STEPVERT+1)*2)
 
 //#define ADC12B
 #define ADC10B
@@ -53,8 +54,8 @@ private:
     float frequencyCalc(uint16_t* bufferADC);
     sf::Font font;
     sf::Text frequency;
-    sf::Text amplitude;
     sf::Text period;
+    sf::Text VperCell;
 };
 
 

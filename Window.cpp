@@ -20,7 +20,7 @@ void Window::Update()
 
 void Window::BeginDraw()
 {
-    window.clear(sf::Color::White);
+    window.clear(sf::Color(0x18,0x18,0x18));
 }
 
 void Window::Draw(const sf::Drawable& drawable)
