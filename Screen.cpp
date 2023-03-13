@@ -6,7 +6,6 @@ Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip),gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
         gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT))
 {
-    
     for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
     {
         gridOx[2*i].color = sf::Color(128,128,128);
@@ -28,7 +27,6 @@ Screen::Screen()
 
 void Screen::Update()
 {   
-    
     //Screen::ReadDataTTY();
     ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));

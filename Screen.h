@@ -50,6 +50,7 @@ private:
     sf::VertexArray gridOx;
     sf::VertexArray gridOy;
     TTY ADC_Data;
+
     void convertADC_DataForScreen(uint16_t* bufferADC);
     float frequencyCalc(uint16_t* bufferADC);
     sf::Font font;

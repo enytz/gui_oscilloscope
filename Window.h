@@ -15,6 +15,7 @@ class Window
         void Draw(const sf::Drawable& drawable);
         void EndDraw();
         bool IsOpen() const;
+        sf::RenderWindow& GetRef(){return window;}
     private:
         sf::RenderWindow window;
 };
