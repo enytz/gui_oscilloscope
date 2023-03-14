@@ -3,6 +3,7 @@
 
 #include "Window.h"
 #include "TTY.h"
+#include "Button.h"
 #include <string>
 
 
@@ -41,6 +42,7 @@ class Screen
 public:
     Screen();
     void Update();
+    void LateUpdate();
     void Draw();
     bool IsRunning();
     void ReadDataTTY();
@@ -57,6 +59,7 @@ private:
     sf::Text frequency;
     sf::Text period;
     sf::Text VperCell;
+    Button but;
 };
 
 

@@ -4,7 +4,7 @@
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip),gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
-        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT))
+        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT)),but(font)
 {
     for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
     {
@@ -38,11 +38,32 @@ void Screen::Update()
    // ADC_Data.readyReceiveData();
 }
 
+void Screen::LateUpdate()
+{
+    
+    static int counter = 0;
+    bool flag   = 0;
+    if (but.buttonIsPressed(window.GetRef()))
+    {
+        counter++;
+        flag =1;
+        std::cout<<counter<<'\n';
+    }
+    if (!flag)
+        counter = 0;
+    flag =0;
+    
+}
+
 void Screen::Draw()
 {
     window.BeginDraw();
     window.Draw(gridOx);
     window.Draw(gridOy);
+
+    window.Draw(but.getRefBbox());
+    window.Draw(but.getRefBtext());
+
     window.Draw(frequency);
     window.Draw(period);
     window.Draw(graphLines);
