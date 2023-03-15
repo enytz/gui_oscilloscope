@@ -4,7 +4,7 @@
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip),gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
-        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT)),but(font)
+        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT)),sweepButton(font),scaleButton(font)
 {
     for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
     {
@@ -23,6 +23,11 @@ Screen::Screen()
     }
     if (!font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"))
             std::cout<<"Error reading font"<<std::endl;
+
+    sweepButton.setPosition(sf::Vector2f(1050,150));
+    sweepButton.setLabel("mks/cell");
+    scaleButton.setPosition(sf::Vector2f(1050,225));
+    scaleButton.setLabel("scale X");
 }
 
 void Screen::Update()
@@ -40,19 +45,24 @@ void Screen::Update()
 
 void Screen::LateUpdate()
 {
-    
     static int counter = 0;
     bool flag   = 0;
-    if (but.buttonIsPressed(window.GetRef()))
+    if (sweepButton.buttonIsPressed(window.GetRef()) || scaleButton.buttonIsPressed(window.GetRef()))
     {
         counter++;
-        flag =1;
+        flag = 1;
         std::cout<<counter<<'\n';
     }
+
+    if (counter && !flag)
+        {
+
+        std::cout<<"End press\n";
+        // callback function 
+        }
+
     if (!flag)
-        counter = 0;
-    flag =0;
-    
+        counter = 0;    
 }
 
 void Screen::Draw()
@@ -61,8 +71,13 @@ void Screen::Draw()
     window.Draw(gridOx);
     window.Draw(gridOy);
 
-    window.Draw(but.getRefBbox());
-    window.Draw(but.getRefBtext());
+    window.Draw(sweepButton.getRefBframe());
+    window.Draw(sweepButton.getRefBbox());
+    window.Draw(sweepButton.getRefBtext());
+
+    window.Draw(scaleButton.getRefBframe());
+    window.Draw(scaleButton.getRefBbox());
+    window.Draw(scaleButton.getRefBtext());
 
     window.Draw(frequency);
     window.Draw(period);
@@ -90,7 +105,7 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 
     graphLines.resize(bufferSize-offset);
 
-    int coef = 5;
+    int coef = 2;
     for (int i=0;i<bufferSize-offset;++i)
     {
         graphLines[i].color = sf::Color::Blue;

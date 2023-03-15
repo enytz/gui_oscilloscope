@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-#define SIZE_HOR 1200
+#define SIZE_HOR 1300
 #define SIZE_VERT 700
 class Window
 {

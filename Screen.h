@@ -46,6 +46,7 @@ public:
     void Draw();
     bool IsRunning();
     void ReadDataTTY();
+    sf::Font getFont()const {return font;}
 private:
     Window window;
     sf::VertexArray graphLines;
@@ -59,7 +60,8 @@ private:
     sf::Text frequency;
     sf::Text period;
     sf::Text VperCell;
-    Button but;
+    Button sweepButton;     // for each new button in initialization list add font for button
+    Button scaleButton;
 };
 
 
