@@ -1,3 +1,12 @@
+/*
+symbol for fuction to transfer on STM:
+    - 'r' - request for transmit new data on PC;
+    - 'c' - request on change sampling times;
+
+*/
+
+
+
 #ifndef TTY_h
 #define TTY_h
 
@@ -20,7 +29,7 @@ struct TTY
         TTY();
         ~TTY();
         void readData();
-        void readyReceiveData();
+        void TransmitData (const uint8_t symbol);
         uint16_t& getData() {return *buffer_ADC;}
         int getSizeBuffer() const {return BUFFER_SIZE;}
         int getTrigValue() const {return trigValue;}

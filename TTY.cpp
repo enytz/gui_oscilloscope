@@ -117,14 +117,13 @@ void TTY::readData()
     std::cout<<"---------------------------------------------------\n";
 }
 
-void TTY::readyReceiveData()
+void TTY::TransmitData(uint8_t symbol)
 {
-    uint8_t word{'r'};
     int numWritingBytes = 0;
     int numBytes =0;
     do
     {
-        numBytes = write(serial_port,&word,sizeof(word));
+        numBytes = write(serial_port,&symbol,sizeof(symbol));
         numWritingBytes += numBytes;
         if (numWritingBytes < 0)
             {
@@ -132,7 +131,7 @@ void TTY::readyReceiveData()
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
     }while(numWritingBytes < 1);
-    std::cout<<"Request transfer is complited\n";
+    std::cout<<"Transfer is complited\n";
 }
 
 uint16_t TTY::offsetWithTrig()

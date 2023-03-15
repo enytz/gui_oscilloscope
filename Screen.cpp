@@ -4,7 +4,7 @@
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip),gridOx(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_HOR)),
-        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT)),sweepButton(font),scaleButton(font)
+        gridOy(sf::PrimitiveType::Lines,(NUMBER_OF_LINES_VERT)),sweepButton(font),scaleButton(font), scaleCoef(2)
 {
     for (int i=0;i<NUMBER_OF_LINES_HOR/2;++i)
     {
@@ -32,37 +32,45 @@ Screen::Screen()
 
 void Screen::Update()
 {   
-    //Screen::ReadDataTTY();
-    ADC_Data.pseudo_data();
+    Screen::ReadDataTTY();
+    //ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
 
     setStringOnDisplay(frequency,font,"Freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData()))/1000)+" kHz",120,610,20,sf::Color::White);
     setStringOnDisplay(period,font,"T: "+std::to_string(1/frequencyCalc(&(ADC_Data.getData()))*1000)+" ms",450,610,20,sf::Color::White);
 
     window.Update();
-   // ADC_Data.readyReceiveData();
+    ADC_Data.TransmitData('r');
 }
 
 void Screen::LateUpdate()
 {
-    static int counter = 0;
+    static int counterSweep = 0;
+    static int counterScale = 0;
     bool flag   = 0;
-    if (sweepButton.buttonIsPressed(window.GetRef()) || scaleButton.buttonIsPressed(window.GetRef()))
+    if (sweepButton.buttonIsPressed(window.GetRef()))
     {
-        counter++;
+        counterSweep++;
         flag = 1;
-        std::cout<<counter<<'\n';
+        //std::cout<<counterSweep<<'\n';
     }
+    else if(scaleButton.buttonIsPressed(window.GetRef()))
+    {
+        counterScale++;
+        flag = 1;
+        //std::cout<<counterScale<<'\n';
 
-    if (counter && !flag)
+    }
+    if ((counterSweep || counterScale) && !flag)
         {
-
-        std::cout<<"End press\n";
-        // callback function 
+            counterSweep?CBSweep():CBScale();
         }
 
     if (!flag)
-        counter = 0;    
+    {
+        counterSweep = 0; 
+        counterScale = 0;
+    }   
 }
 
 void Screen::Draw()
@@ -105,11 +113,10 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 
     graphLines.resize(bufferSize-offset);
 
-    int coef = 2;
     for (int i=0;i<bufferSize-offset;++i)
     {
         graphLines[i].color = sf::Color::Blue;
-        graphLines[i].position = sf::Vector2f(coef*i+100,SIZE_VERT-bufferADC[i]/COEF-100);
+        graphLines[i].position = sf::Vector2f(scaleCoef*i+100,SIZE_VERT-bufferADC[i]/COEF-100);
     }
 }
 
@@ -138,6 +145,32 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
         }
     }
     return 0;
+}
+
+void Screen::CBScale()
+{
+    static int numPushButton=0;
+    numPushButton++;
+    switch (numPushButton)
+    {
+        case 1:
+            setCoef(5);
+            break;
+        case 2:
+            setCoef(10);
+            break;
+        default:
+            setCoef(2);
+            numPushButton =0;
+            break;
+    }
+    std::cout<<"CBScale\n";
+}
+
+void Screen::CBSweep()
+{
+    ADC_Data.TransmitData('c');
+    std::cout<<"CBSweep\n";
 }
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,

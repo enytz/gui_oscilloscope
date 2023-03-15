@@ -46,7 +46,6 @@ public:
     void Draw();
     bool IsRunning();
     void ReadDataTTY();
-    sf::Font getFont()const {return font;}
 private:
     Window window;
     sf::VertexArray graphLines;
@@ -56,12 +55,16 @@ private:
 
     void convertADC_DataForScreen(uint16_t* bufferADC);
     float frequencyCalc(uint16_t* bufferADC);
+    void CBScale();
+    void CBSweep();
+    void setCoef(int coef) {scaleCoef = coef;}
     sf::Font font;
     sf::Text frequency;
     sf::Text period;
     sf::Text VperCell;
     Button sweepButton;     // for each new button in initialization list add font for button
     Button scaleButton;
+    int scaleCoef;
 };
 
 
