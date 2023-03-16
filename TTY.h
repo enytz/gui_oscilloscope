@@ -18,8 +18,8 @@ symbol for fuction to transfer on STM:
 #include <math.h>       // generate pseudo data
 #include <random>
 
-#define BUFFER_SIZE 200
-#define TRIG_VALUE  500
+#define BUFFER_SIZE 300
+#define TRIG_VALUE  860
 
 #include <iostream>
 
@@ -35,12 +35,16 @@ struct TTY
         int getTrigValue() const {return trigValue;}
         void setTrigValue(int val) {trigValue = val;}
         uint16_t offsetWithTrig();
-
+        float timeConversion();
+        void setFlagIncrementCyclesADC(){flagIncrementCycles = 1;}
         void pseudo_data();
     private:
 
         uint16_t buffer_ADC[BUFFER_SIZE];
         uint8_t buffer[BUFFER_SIZE*2];
+
+        float numOfCycles[8];
+        bool flagIncrementCycles;
 
         int trigValue;
         int serial_port;

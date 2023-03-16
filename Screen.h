@@ -62,6 +62,7 @@ private:
     sf::Text frequency;
     sf::Text period;
     sf::Text VperCell;
+    sf::Text mksPerCell;
     Button sweepButton;     // for each new button in initialization list add font for button
     Button scaleButton;
     int scaleCoef;

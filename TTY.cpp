@@ -2,7 +2,7 @@
 #include <thread>
 
 TTY::TTY()
-    :trigValue(TRIG_VALUE)
+    :numOfCycles{1.5, 7.5, 13.5, 28.5, 41.5, 55.5, 71.5, 239.5}, flagIncrementCycles(0), trigValue(TRIG_VALUE)
 {
     for (int i=0;i<BUFFER_SIZE;++i)
     {
@@ -119,34 +119,45 @@ void TTY::readData()
 
 void TTY::TransmitData(uint8_t symbol)
 {
-    int numWritingBytes = 0;
     int numBytes =0;
     do
     {
         numBytes = write(serial_port,&symbol,sizeof(symbol));
-        numWritingBytes += numBytes;
-        if (numWritingBytes < 0)
+        if (numBytes < 0)
             {
                 perror("Error transmit: ");
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
-    }while(numWritingBytes < 1);
+    }while(numBytes < 1);
     std::cout<<"Transfer is complited\n";
 }
 
 uint16_t TTY::offsetWithTrig()
 {
-    uint16_t preTrigValue = BUFFER_SIZE/4;
+    uint16_t preTrigValue = BUFFER_SIZE/3;
     bool flag =0;
     for (int i=preTrigValue;i<BUFFER_SIZE;++i)
     {
         if (buffer_ADC[i-1] < trigValue && buffer_ADC[i]> trigValue)
             flag =1;
         if (buffer_ADC[i]> trigValue && flag)
-            return i-BUFFER_SIZE/4;
+            return i-BUFFER_SIZE/3;
         
     }
     return 0;
+}
+
+float TTY::timeConversion()
+{
+    static int idx = 0;
+    if(flagIncrementCycles)
+    {
+        idx++;
+        if (idx >7)
+            idx = 0;
+        flagIncrementCycles = 0;
+    }
+    return 0.000000821+numOfCycles[idx]*(0.000000071);  // 821ns - time sampling 10B ADC,   1/14MHz = 71 ns
 }
 
 void TTY::pseudo_data()
@@ -155,9 +166,9 @@ void TTY::pseudo_data()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0,360);
     float dt = BUFFER_SIZE/360.0;
-    int Ampl = 1000;
-    int f    = 10;
-    int fi = M_PI*dist(gen)/180;
+    int Ampl = 900;
+    float f  = 1;
+    int fi   = M_PI*dist(gen)/180;
     for(int i=0;i<BUFFER_SIZE;++i)
     {
         buffer_ADC[i] = Ampl/2*sin(2*M_PI*dt*i*f/180+fi)+Ampl/2;      //sin

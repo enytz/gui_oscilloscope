@@ -32,15 +32,16 @@ Screen::Screen()
 
 void Screen::Update()
 {   
-    Screen::ReadDataTTY();
-    //ADC_Data.pseudo_data();
+    //Screen::ReadDataTTY();
+    ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
 
     setStringOnDisplay(frequency,font,"Freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData()))/1000)+" kHz",120,610,20,sf::Color::White);
     setStringOnDisplay(period,font,"T: "+std::to_string(1/frequencyCalc(&(ADC_Data.getData()))*1000)+" ms",450,610,20,sf::Color::White);
+    setStringOnDisplay(mksPerCell,font,"mks/cell "+std::to_string(50*ADC_Data.timeConversion()*1000000/scaleCoef), 700,610,20,sf::Color::White);
 
     window.Update();
-    ADC_Data.TransmitData('r');
+    //ADC_Data.TransmitData('r');
 }
 
 void Screen::LateUpdate()
@@ -52,13 +53,11 @@ void Screen::LateUpdate()
     {
         counterSweep++;
         flag = 1;
-        //std::cout<<counterSweep<<'\n';
     }
     else if(scaleButton.buttonIsPressed(window.GetRef()))
     {
         counterScale++;
         flag = 1;
-        //std::cout<<counterScale<<'\n';
 
     }
     if ((counterSweep || counterScale) && !flag)
@@ -79,6 +78,11 @@ void Screen::Draw()
     window.Draw(gridOx);
     window.Draw(gridOy);
 
+    window.Draw(frequency);
+    window.Draw(period);
+    window.Draw(graphLines);
+    window.Draw(mksPerCell);
+
     window.Draw(sweepButton.getRefBframe());
     window.Draw(sweepButton.getRefBbox());
     window.Draw(sweepButton.getRefBtext());
@@ -86,10 +90,6 @@ void Screen::Draw()
     window.Draw(scaleButton.getRefBframe());
     window.Draw(scaleButton.getRefBbox());
     window.Draw(scaleButton.getRefBtext());
-
-    window.Draw(frequency);
-    window.Draw(period);
-    window.Draw(graphLines);
     window.EndDraw();
 }
 
@@ -109,25 +109,23 @@ void Screen::convertADC_DataForScreen(uint16_t* bufferADC)
 {
     int offset = ADC_Data.offsetWithTrig();
     bufferADC += offset;
-    int bufferSize = ADC_Data.getSizeBuffer();
+    int bufferSize = ADC_Data.getSizeBuffer()-offset;
+    graphLines.resize(bufferSize);
 
-    graphLines.resize(bufferSize-offset);
-
-    for (int i=0;i<bufferSize-offset;++i)
+    for (int i=0;i<bufferSize;++i)
     {
-        graphLines[i].color = sf::Color::Blue;
+        graphLines[i].color = (scaleCoef*i)<WINDOW_GRID_SIZE_HOR-100? sf::Color::Blue : sf::Color(0x18,0x18,0x18);      // in case if line > cell grid 0X
         graphLines[i].position = sf::Vector2f(scaleCoef*i+100,SIZE_VERT-bufferADC[i]/COEF-100);
     }
 }
 
 float Screen::frequencyCalc(uint16_t* bufferADC)
 {
+    static float frequencyValue = 0;
+    static int countMeas        = 0;
     int startPoint      = BUFFER_SIZE/10;
     int endpoint        = BUFFER_SIZE - startPoint-1;
     int trigVal         = ADC_Data.getTrigValue();
-    float numCyclesADC  = 1.5;
-    float timeSampl     = 0.000000821;
-    float timeConversion= timeSampl+numCyclesADC*(1.0/14000000);
     bool flagRising1    = 0;
     int valFlagR1       = 0;
     int valFlagR2       = 0;
@@ -136,7 +134,14 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
         if (bufferADC[i] <trigVal && bufferADC[i+1] > trigVal && flagRising1)
         {
             valFlagR2 = i;
-            return 1/((valFlagR2-valFlagR1)*timeConversion);
+            countMeas++;
+            if (countMeas == 10)
+            {
+                frequencyValue = 1/((valFlagR2-valFlagR1)*ADC_Data.timeConversion());
+                return frequencyValue;
+            }
+            return frequencyValue;
+            //return 1/((valFlagR2-valFlagR1)*timeConversion);
         }
         if (bufferADC[i] < trigVal && bufferADC[i+1] > trigVal)
         {
@@ -144,7 +149,8 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
             valFlagR1 = i;
         }
     }
-    return 0;
+    //return 0;
+    return frequencyValue;
 }
 
 void Screen::CBScale()
@@ -170,7 +176,9 @@ void Screen::CBScale()
 void Screen::CBSweep()
 {
     ADC_Data.TransmitData('c');
+    ADC_Data.setFlagIncrementCyclesADC();
     std::cout<<"CBSweep\n";
+    
 }
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,
