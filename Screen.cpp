@@ -32,8 +32,8 @@ Screen::Screen()
 
 void Screen::Update()
 {   
-    //Screen::ReadDataTTY();
-    ADC_Data.pseudo_data();
+    Screen::ReadDataTTY();
+    //ADC_Data.pseudo_data();
     Screen::convertADC_DataForScreen(&(ADC_Data.getData()));
 
     setStringOnDisplay(frequency,font,"Freq: "+std::to_string(frequencyCalc(&(ADC_Data.getData()))/1000)+" kHz",120,610,20,sf::Color::White);
@@ -41,7 +41,7 @@ void Screen::Update()
     setStringOnDisplay(mksPerCell,font,"mks/cell "+std::to_string(50*ADC_Data.timeConversion()*1000000/scaleCoef), 700,610,20,sf::Color::White);
 
     window.Update();
-    //ADC_Data.TransmitData('r');
+    ADC_Data.TransmitData('r');
 }
 
 void Screen::LateUpdate()
@@ -135,7 +135,7 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
         {
             valFlagR2 = i;
             countMeas++;
-            if (countMeas == 10)
+            if (countMeas >= 10)
             {
                 frequencyValue = 1/((valFlagR2-valFlagR1)*ADC_Data.timeConversion());
                 return frequencyValue;

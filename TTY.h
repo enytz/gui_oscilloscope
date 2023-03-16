@@ -1,7 +1,7 @@
 /*
 symbol for fuction to transfer on STM:
     - 'r' - request for transmit new data on PC;
-    - 'c' - request on change sampling times;
+    - 'c' - request to change number of the cycles ADC;
 
 */
 
