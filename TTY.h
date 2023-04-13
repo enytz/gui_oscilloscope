@@ -1,3 +1,12 @@
+/*
+symbol for fuction to transfer on STM:
+    - 'r' - request for transmit new data on PC;
+    - 'c' - request to change number of the cycles ADC;
+
+*/
+
+
+
 #ifndef TTY_h
 #define TTY_h
 
