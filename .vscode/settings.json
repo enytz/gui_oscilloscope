@@ -26,6 +26,12 @@
         "string": "cpp",
         "system_error": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "stm32f0xx_ll_usart.h": "c",
+        "stm32f1xx.h": "c",
+        "stm32f103xb.h": "c",
+        "stm32f1xx_ll_system.h": "c",
+        "stm32f1xx_ll_cortex.h": "c",
+        "stm32f0xx_ll_rcc.h": "c"
     }
 }

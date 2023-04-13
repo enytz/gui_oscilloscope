@@ -1,3 +1,4 @@
+
 #ifndef Screen_h
 #define Screen_h
 
@@ -19,26 +20,26 @@
 //#define ADC8B
 
 #ifdef ADC12B 
-    #define MAX_SCALE_VALUE 4095
-    #define COEF            8.19
+#define MAX_SCALE_VALUE 4095
+#define COEF            8.19
 #endif
 
 #ifdef ADC10B 
-    #define MAX_SCALE_VALUE 1023
-    #define COEF            2.046
+#define MAX_SCALE_VALUE 1023
+#define COEF            2.046
 #endif
 
 #ifdef ADC8B 
-    #define MAX_SCALE_VALUE 255
-    #define COEF            0.51
+#define MAX_SCALE_VALUE 255
+#define COEF            0.51
 #endif
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,
-                         const float posX, const float posY, const unsigned int size = 30,
-                          sf::Color color = sf::Color::Black);
+    const float posX, const float posY, const unsigned int size = 30,
+    sf::Color color = sf::Color::Black);
 
 class Screen
-{   
+{
 public:
     Screen();
     void Update();
@@ -57,7 +58,7 @@ private:
     float frequencyCalc(uint16_t* bufferADC);
     void CBScale();
     void CBSweep();
-    void setCoef(int coef) {scaleCoef = coef;}
+    void setCoef(int coef) { scaleCoef = coef; }
     sf::Font font;
     sf::Text frequency;
     sf::Text period;

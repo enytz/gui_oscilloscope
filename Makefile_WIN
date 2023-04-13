@@ -1,0 +1,25 @@
+CC		= g++
+INC		= -IC:\Users\enytz\project_G\SFML-2.5.1\include
+LIB		= -LC:\Users\enytz\project_G\SFML-2.5.1\lib
+FLAGS	= -c -DSFML_STATIC -Wall
+PROJECT = testSFML
+
+.PHONY: clear all
+
+all: Button.o Screen.o TTY.o Window.o main.o
+	$(CC) main.o Window.o TTY.o Screen.o Button.o $(LIB) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lfreetype -lopengl32  -lwinmm  -lgdi32 -o $(PROJECT)
+
+main.o: main.cpp
+	$(CC) $(FLAGS) $(INC) main.cpp 
+Window.o:
+	$(CC) $(FLAGS) $(INC) Window.cpp 
+TTY.o :
+	$(CC) -c TTY.cpp 
+Screen.o: Screen.cpp
+	$(CC) $(FLAGS) $(INC) Screen.cpp 
+Button.o: Button.cpp
+	$(CC) $(FLAGS) $(INC) Button.cpp 
+
+clear:
+	del /q *.o
+

@@ -1,7 +1,7 @@
 #include "Window.h"
 
 Window::Window(const std::string& windowName)
-    :window(sf::VideoMode(SIZE_HOR,SIZE_VERT),windowName)
+    :window(sf::VideoMode(SIZE_HOR, SIZE_VERT), windowName)
 {
     window.setVerticalSyncEnabled(1);
 }
@@ -12,15 +12,15 @@ void Window::Update()
     if (window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
+        {
+            window.close();
+        }
     }
 }
 
 void Window::BeginDraw()
 {
-    window.clear(sf::Color(0x18,0x18,0x18));
+    window.clear(sf::Color(0x18, 0x18, 0x18));
 }
 
 void Window::Draw(const sf::Drawable& drawable)
@@ -35,7 +35,7 @@ void Window::EndDraw()
 
 bool Window::IsOpen() const
 {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            return false;
-        return true;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        return false;
+    return true;
 }

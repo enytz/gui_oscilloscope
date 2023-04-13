@@ -8,15 +8,15 @@
 #define SIZE_VERT 700
 class Window
 {
-    public:
-        Window(const std::string& windowName);
-        void Update();
-        void BeginDraw();
-        void Draw(const sf::Drawable& drawable);
-        void EndDraw();
-        bool IsOpen() const;
-        const sf::RenderWindow& GetRef()const{return window;}
-    private:
-        sf::RenderWindow window;
+public:
+    Window(const std::string& windowName);
+    void Update();
+    void BeginDraw();
+    void Draw(const sf::Drawable& drawable);
+    void EndDraw();
+    bool IsOpen() const;
+    const sf::RenderWindow& GetRef()const { return window; }
+private:
+    sf::RenderWindow window;
 };
 #endif
