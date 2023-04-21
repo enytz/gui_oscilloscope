@@ -145,6 +145,7 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
             if (countMeas == 10)
             {
                 frequencyValue = 1 / ((valFlagR2 - valFlagR1) * ADC_Data.timeConversion());
+                countMeas = 0;
                 return frequencyValue;
             }
             return frequencyValue;
