@@ -1,17 +1,8 @@
-/*
-symbol for fuction to transfer on STM:
-    - 'r' - request for transmit new data on PC;
-    - 'c' - request to change number of the cycles ADC;
-
-*/
-
-
-
 #ifndef TTY_h
 #define TTY_h
 
-#define BUFFER_SIZE 300
-#define TRIG_VALUE  860
+#define BUFFER_SIZE 450
+#define TRIG_VALUE  900     // preload Value
 
 #include <iostream>
 #include <thread>

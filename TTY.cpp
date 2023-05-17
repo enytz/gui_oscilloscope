@@ -266,14 +266,14 @@
 
 uint16_t TTY::offsetWithTrig()
 {
-    uint16_t preTrigValue = BUFFER_SIZE / 3;
+    uint16_t preTrigValue = BUFFER_SIZE / 10;
     bool flag = 0;
     for (int i = preTrigValue;i < BUFFER_SIZE;++i)
     {
         if (buffer_ADC[i - 1] < trigValue && buffer_ADC[i]> trigValue)
             flag = 1;
         if (buffer_ADC[i] > trigValue && flag)
-            return i - BUFFER_SIZE / 3;
+            return i - BUFFER_SIZE / 10;
     }
     return 0;
 }
@@ -297,9 +297,9 @@ void TTY::pseudo_data()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, 360);
     float dt = BUFFER_SIZE / 360.0;
-    int Ampl = 900;
-    float f = 20;
-    int fi = M_PI * dist(gen) / 180;
+    int Ampl = 1000;
+    float f = 2;
+    float fi = M_PI * dist(gen) / 180.0;
     for (int i = 0;i < BUFFER_SIZE;++i)
     {
        buffer_ADC[i] = Ampl / 2 * sin(2 * M_PI * dt * i * f / 180 + fi) + Ampl / 2;      //sin

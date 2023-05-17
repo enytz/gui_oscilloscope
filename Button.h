@@ -11,7 +11,7 @@ public:
     Button(const sf::Font& font, sf::Vector2f position = sf::Vector2f(200, 200), const std::string label = "label1");
     Button() {}
     bool buttonIsPressed(const sf::RenderWindow& window);
-    void setSize(sf::Vector2f size) { Bbox.setSize(size); }
+    void setSize(sf::Vector2f size) { Bbox.setSize(size); Bframe.setSize(size);}
     void setPosition(sf::Vector2f position) { Bbox.setPosition(position);Bframe.setPosition(position); Btext.setPosition(sf::Vector2f(position.x + 10, position.y + 10)); }
     void setLabel(const std::string& str) { Btext.setString(str); }
     const sf::RectangleShape& getRefBbox() const { return Bbox; }

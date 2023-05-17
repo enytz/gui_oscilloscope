@@ -58,6 +58,7 @@ private:
     float frequencyCalc(uint16_t* bufferADC);
     void CBScale();
     void CBSweep();
+    void CBSetTriggerValue();
     void setCoef(int coef) { scaleCoef = coef; }
     sf::Font font;
     sf::Text frequency;
@@ -66,6 +67,7 @@ private:
     sf::Text mksPerCell;
     Button sweepButton;     // for each new button in initialization list add font for button
     Button scaleButton;
+    Button triggerValue;
     int scaleCoef;
 };
 

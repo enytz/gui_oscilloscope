@@ -5,7 +5,7 @@
 
 Screen::Screen()
     : window("No name"), graphLines(sf::PrimitiveType::LineStrip), gridOx(sf::PrimitiveType::Lines, (NUMBER_OF_LINES_HOR)),
-    gridOy(sf::PrimitiveType::Lines, (NUMBER_OF_LINES_VERT)), sweepButton(font), scaleButton(font), scaleCoef(2)
+    gridOy(sf::PrimitiveType::Lines, (NUMBER_OF_LINES_VERT)), sweepButton(font), scaleButton(font), triggerValue(font) , scaleCoef(2)
 {
     for (int i = 0;i < NUMBER_OF_LINES_HOR / 2;++i)
     {
@@ -31,10 +31,14 @@ Screen::Screen()
 #endif
         std::cout << "Error reading font" << std::endl;
 
+    // button settings 
     sweepButton.setPosition(sf::Vector2f(1050, 150));
     sweepButton.setLabel("mks/cell");
     scaleButton.setPosition(sf::Vector2f(1050, 225));
     scaleButton.setLabel("scale X");
+
+    triggerValue.setPosition(sf::Vector2f(1050, 300));
+    triggerValue.setSize(sf::Vector2f(100, 75));
 }
 
 void Screen::Update()
@@ -47,35 +51,52 @@ void Screen::Update()
     setStringOnDisplay(period, font, "T: " + std::to_string(1 / frequencyCalc(&(ADC_Data.getData())) * 1000) + " ms", 450, 610, 20, sf::Color::White);
     setStringOnDisplay(mksPerCell, font, "mks/cell " + std::to_string(50 * ADC_Data.timeConversion() * 1000000 / scaleCoef), 700, 610, 20, sf::Color::White);
 
+    triggerValue.setLabel("trigger\n " + std::to_string(ADC_Data.getTrigValue()));
+
     window.Update();
    // ADC_Data.TransmitData('r');
 }
 
 void Screen::LateUpdate()
 {
-    static int counterSweep = 0;
-    static int counterScale = 0;
+    static bool counterSweep = 0;
+    static bool counterScale = 0;
+    static bool triggerValueFlag = 0;
     bool flag = 0;
     if (sweepButton.buttonIsPressed(window.GetRef()))
     {
-        counterSweep++;
-        flag = 1;
+        counterSweep = 1;
+        flag         = 1;
     }
     else if (scaleButton.buttonIsPressed(window.GetRef()))
     {
-        counterScale++;
-        flag = 1;
+        counterScale = 1;
+        flag         = 1;
 
     }
-    if ((counterSweep || counterScale) && !flag)
+    else if (triggerValue.buttonIsPressed(window.GetRef()))
     {
-        counterSweep ? CBSweep() : CBScale();
+        triggerValueFlag = 1;
+        flag             = 1;
+    }
+
+    if ((counterSweep || counterScale || triggerValueFlag) && !flag)
+    {
+        if (counterSweep)
+            CBSweep();
+        else if (counterScale)
+            CBScale();
+        else
+            CBSetTriggerValue();
+        //counterSweep ? CBSweep() : CBScale();
     }
 
     if (!flag)
     {
-        counterSweep = 0;
-        counterScale = 0;
+        counterSweep     = 0;
+        counterScale     = 0;
+        triggerValueFlag = 0;
+
     }
 }
 
@@ -90,6 +111,7 @@ void Screen::Draw()
     window.Draw(graphLines);
     window.Draw(mksPerCell);
 
+    //button draw
     window.Draw(sweepButton.getRefBframe());
     window.Draw(sweepButton.getRefBbox());
     window.Draw(sweepButton.getRefBtext());
@@ -97,6 +119,11 @@ void Screen::Draw()
     window.Draw(scaleButton.getRefBframe());
     window.Draw(scaleButton.getRefBbox());
     window.Draw(scaleButton.getRefBtext());
+
+    window.Draw(triggerValue.getRefBframe());
+    window.Draw(triggerValue.getRefBbox());
+    window.Draw(triggerValue.getRefBtext());
+    //------------------------
     window.EndDraw();
 }
 
@@ -145,7 +172,6 @@ float Screen::frequencyCalc(uint16_t* bufferADC)
             if (countMeas == 10)
             {
                 frequencyValue = 1 / ((valFlagR2 - valFlagR1) * ADC_Data.timeConversion());
-                countMeas = 0;
                 return frequencyValue;
             }
             return frequencyValue;
@@ -187,6 +213,16 @@ void Screen::CBSweep()
     ADC_Data.setFlagIncrementCyclesADC();
     std::cout << "CBSweep\n";
 
+}
+
+void Screen::CBSetTriggerValue()
+{
+    int trigValue = ADC_Data.getTrigValue();
+    trigValue += 100;
+    if (trigValue >= 1000)
+        trigValue = 0;
+    ADC_Data.setTrigValue(trigValue);
+    std::cout << "CBTriggerValue\n";
 }
 
 void setStringOnDisplay(sf::Text& text, sf::Font& font, const std::string& str,
