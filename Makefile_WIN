@@ -2,7 +2,7 @@ CC		= g++
 INC		= -IC:\Users\enytz\project_G\SFML-2.5.1\include
 LIB		= -LC:\Users\enytz\project_G\SFML-2.5.1\lib
 FLAGS	= -c -DSFML_STATIC -Wall
-PROJECT = testSFML
+PROJECT = UI_oscilloscope
 
 .PHONY: clear all
 
